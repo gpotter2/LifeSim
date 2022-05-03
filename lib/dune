@@ -1,0 +1,7 @@
+(ocamlyacc pcfparse)
+
+(ocamllex pcflex)
+
+(library
+ (name Vol)
+ (modules_without_implementation vmBytecode))
