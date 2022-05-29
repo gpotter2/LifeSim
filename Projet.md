@@ -13,11 +13,11 @@ struct Oiseau {
     vy: 0;
 }
 
-let oiseauPres a b = (distance a b) < 10 in
-Oiseau x <=> Oiseau L if oiseauPres x L do {
-    (Oiseau {}, Oiseau {})
+let oiseauPres a b = (distance (a (b))) < 10 in
+Oiseau x <=> Oiseau L if oiseauPres (x (L)) do {
     // Actions à effectuer, modifier le comportement.
     // L contient la liste des 2 plus proches oiseaux
+    (Oiseau {}, Oiseau {})
 }
 
 init {

@@ -5,7 +5,7 @@ open Vol
 let usage () =
   let _ =
     Printf.eprintf
-      "Usage: %s [file]\n\tRead a PCF program from file (default is stdin)\n%!"
+      "Usage: %s [file]\n\tLit et exécute un comportement (default is stdin)\n%!"
       Sys.argv.(0)
   in
   exit 1
@@ -24,7 +24,9 @@ let main () =
               exit 1))
     | _ -> usage ()
   in
-  let _ = Printf.printf "        Welcome to PCF, version %s\n%!" version in
+  let _ =
+    Printf.printf "        Simulateur de comportements, version %s\n%!" version
+  in
   let lexbuf = Lexing.from_channel input_channel in
   while true do
     try

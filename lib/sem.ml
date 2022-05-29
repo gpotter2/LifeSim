@@ -14,7 +14,7 @@ type pcfval =
   | Tupval of pcfval list
   | EntiteClass of { name : string; attrs : attribut list }
   | EntiteInst of { name : string; attrs : attribut list }
-  | Comportement of {
+  | ComportementClass of {
       entity1 : string;
       name1 : string;
       entity2 : string;
@@ -46,8 +46,14 @@ let rec printval = function
       Printf.printf ")"
   | EntiteClass { name; _ } -> Printf.printf "<entite %s>" name
   | EntiteInst { name; _ } -> Printf.printf "<inst entite %s>" name
-  | Comportement { entity1; entity2; _ } ->
-      Printf.printf "<Comportement [%s, %s]>" entity1 entity2
+  | ComportementClass { entity1; name1; entity2; name2; condition; _ } -> (
+      match condition with
+      | Bool true ->
+          Printf.printf "<Comportement %s[%s] <=> %s[%s]]>" entity1 name1
+            entity2 name2
+      | _ ->
+          Printf.printf "<Comportement conditionel %s[%s] <=> %s[%s]]>" entity1
+            name1 entity2 name2)
 
 (* Environnement. *)
 let init_env = []
@@ -136,6 +142,15 @@ let rec eval e rho =
         | _ -> raise (Failure "")
       in
       EntiteInst { name = n; attrs = merge_attrs default_attrs custom_attrs }
-  | _ -> raise (Failure "Can't eval unknown")
+  | Comportement (e1, n1, e2, n2, cond, instr) ->
+      ComportementClass
+        {
+          entity1 = e1;
+          name1 = n1;
+          entity2 = e2;
+          name2 = n2;
+          condition = cond;
+          instruction = instr;
+        }
 
 let eval e = eval e init_env

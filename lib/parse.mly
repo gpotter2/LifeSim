@@ -40,6 +40,8 @@ expr:
     { Comportement($1, $2, $4, $5, $7, $10) }
 | STRUCT IDENT LBRACK entite_expr RBRACK
     { Entite($2, $4) }
+| IDENT LBRACK RBRACK
+    { EntiteVal($1, []) }
 | IDENT LBRACK entite_expr RBRACK
     { EntiteVal($1, $3) }
 | arith_expr                                  { $1 }
@@ -73,9 +75,9 @@ arith_expr:
  */
 
 application:
-  atom             { $1 }
-| MINUS atom       { Monop("-", $2) }
-| application atom { App($1, $2) }
+  atom                { $1 }
+| MINUS atom          { Monop("-", $2) }
+| application atom    { App($1, $2) }
 ;
 
 atom:

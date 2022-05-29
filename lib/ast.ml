@@ -62,4 +62,8 @@ let rec print oc e =
             tup_iter oc req
       in
       fprintf oc "(%a)" (fun oc -> tup_iter oc) tup_expr
-  | _ -> raise (Failure "Token unimplemented")
+  | Comportement (e1, n1, e2, n2, cond, _) -> (
+      match cond with
+      | Bool true -> fprintf oc "(comportement %s[%s] <=> %s[%s])" e1 n1 e2 n2
+      | _ ->
+          fprintf oc "(comportement conditionel %s[%s] <=> %s[%s])" e1 n1 e2 n2)
