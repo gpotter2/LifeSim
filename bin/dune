@@ -1,4 +1,4 @@
 (executables
- (public_names VolCompile VolRun)
- (names mainCompile mainRun)
+ (public_names Vol)
+ (names loop)
  (libraries Vol))

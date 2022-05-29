@@ -1,5 +1,5 @@
 {
-  open Pcfparse ;;
+  open Parse ;;
   exception Eoi ;;
 
   let pc c = Printf.eprintf "Lu '%c'\n%!" c;;
@@ -81,15 +81,22 @@ rule lex = parse
         | "else" -> ELSE
         | "true" -> TRUE
         | "false" -> FALSE
+        | "do" -> DO
+        | "struct" -> STRUCT
         | _ -> IDENT(lxm) }
   | "="   { EQUAL }
+  | "<=>" { DOUBLARRO }
   | ">"   { GREATER} | "<"  { SMALLER }
   | ">="  { GREATEREQUAL} | "<="  { SMALLEREQUAL }
   | "+"   { PLUS } | "-"   { MINUS } | "*" { MULT } | "/" { DIV }
-  | ";;"   { SEMISEMI }
+  | ";"   { SEMI }
+  | ","   { COMA }
   | "->"  { ARROW }
   | '('   { LPAR }
   | ')'   { RPAR }
+  | '{'   { LBRACK }
+  | '}'   { RBRACK }
+  | ':'   { COLON }
   | '"'   { reset_string_buffer();
             in_string lexbuf;
             STRING (get_stored_string()) }

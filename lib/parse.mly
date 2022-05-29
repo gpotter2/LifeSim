@@ -1,5 +1,5 @@
 %{
-  open Pcfast;;
+  open Ast;;
 
   let rec body params expr = match params with
   | [] -> expr
@@ -12,28 +12,43 @@
 %token TRUE FALSE
 %token <string> STRING
 %token PLUS MINUS MULT DIV EQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
-%token LPAR RPAR SEMISEMI
+%token LPAR RPAR LBRACK RBRACK SEMI COLON COMA
 %token LET REC LETREC IN FUN ARROW
 %token IF THEN ELSE
+%token STRUCT
+%token DOUBLARRO DO
 %left EQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
 %left PLUS MINUS
 %left MULT DIV
 
 %start main
-%type <Pcfast.expr> main
+%type <Ast.expr> main
 
 %%
 
-main: expr SEMISEMI { $1 }
-;
+main: expr { $1 };
 
 expr:
-  LETREC IDENT seqident EQUAL expr IN expr    { Letrec($2, (body $3 $5), $7) }
-| LET REC IDENT seqident EQUAL expr IN expr   { Letrec($3, (body $4 $6), $8) }
+  LETREC IDENT IDENT seqident EQUAL expr IN expr    { Letrec($2, $3, (body $4 $6), $8) }
+| LET REC IDENT IDENT seqident EQUAL expr IN expr   { Letrec($3, $4, (body $5 $7), $9) }
 | LET IDENT seqident EQUAL expr IN expr       { Let($2, (body $3 $5) , $7) }
 | FUN IDENT ARROW expr                        { Fun($2, $4) }
 | IF expr THEN expr ELSE expr                 { If($2, $4, $6) }
+| IDENT IDENT DOUBLARRO IDENT IDENT DO LBRACK expr RBRACK
+    { Comportement($1, $2, $4, $5, Bool(true), $8) }
+| IDENT IDENT DOUBLARRO IDENT IDENT IF expr DO LBRACK expr RBRACK
+    { Comportement($1, $2, $4, $5, $7, $10) }
+| STRUCT IDENT LBRACK entite_expr RBRACK
+    { Entite($2, $4) }
+| IDENT LBRACK entite_expr RBRACK
+    { EntiteVal($1, $3) }
 | arith_expr                                  { $1 }
+;
+
+entite_expr:
+  entite_expr SEMI entite_expr                  { $1 @ $3 }
+  | entite_expr SEMI                            { $1 }
+  | IDENT COLON expr                            { [Attribut($1, $3)] }
 ;
 
 arith_expr:
@@ -69,7 +84,14 @@ atom:
 | FALSE          { Bool(false) }
 | STRING         { String($1) }
 | IDENT          { Ident($1) }
+| LPAR tup_expr RPAR { Tuple($2) }
 | LPAR expr RPAR { $2 }
+;
+
+tup_expr:
+  tup_expr COMA tup_expr    { $1 @ $3 }
+  | tup_expr COMA           { $1 }
+  | expr                    { [$1] }
 ;
 
 seqident:

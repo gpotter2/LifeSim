@@ -1,7 +1,6 @@
-(ocamlyacc pcfparse)
+(ocamlyacc parse)
 
-(ocamllex pcflex)
+(ocamllex lex)
 
 (library
- (name Vol)
- (modules_without_implementation vmBytecode))
+ (name Vol))
