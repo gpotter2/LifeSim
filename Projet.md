@@ -8,7 +8,8 @@ Programmer un essain d'oiseaux
 
 ```
 struct Oiseau {
-    // Attributs par défaut: x et y
+    x: 0;
+    y: 0;
     vx: 0;
     vy: 0;
 }
@@ -22,6 +23,6 @@ Oiseau x <=> Oiseau L if oiseauPres x L do {
 }
 
 init {
-    Oiseau: <nombre>;
-}
+    Oiseau: 10;
+};
 ```

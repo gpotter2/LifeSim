@@ -1,4 +1,4 @@
 (executables
  (public_names Vol)
- (names loop)
+ (names run)
  (libraries Vol))

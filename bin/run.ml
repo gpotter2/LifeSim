@@ -30,6 +30,7 @@ let main () =
     Printf.printf "        Simulateur de comportements, version %s\n%!" version
   in
   let global_env = ref [] in
+  let init_entities = ref [] in
   let comportements = ref [] in
   let lexbuf = Lexing.from_channel input_channel in
   while true do
@@ -39,10 +40,16 @@ let main () =
       let _ = Printf.printf "Recognized: " in
       let _ = Ast.print stdout e in
       let _ = Printf.fprintf stdout " =\n%!" in
-      let v = Sem.eval e !global_env in
+      let v =
+        Sem.eval e
+          (("init", Sem.EntiteClass { name = "init"; attrs = !init_entities })
+          :: !global_env)
+      in
       let _ =
         match v with
-        | Sem.EntiteClass { name; _ } -> global_env := (name, v) :: !global_env
+        | Sem.EntiteClass { name; _ } ->
+            global_env := (name, v) :: !global_env;
+            init_entities := (name, Sem.Intval 0) :: !init_entities
         | Sem.ComportementClass { entity1; entity2; _ } -> (
             match
               ( List.assoc_opt entity1 !global_env,
@@ -50,12 +57,14 @@ let main () =
             with
             | None, None -> Printf.printf "Invalid entity names !\n"
             | _ -> comportements := (entity1, entity2, v) :: !comportements)
+        | Sem.EntiteInst { name = "init"; attrs } -> (
+            Simulator.run !global_env !comportements attrs
+        )
         | _ -> Sem.printval v
       in
       Printf.printf "\n%!"
     with
     | Lex.Eoi ->
-        (*let _ = Simulator.run !global_env !comportements in*)
         Printf.printf "Bye bye.\n%!";
         exit 0
     | Failure msg -> Printf.printf "Erreur: %s\n\n" msg
