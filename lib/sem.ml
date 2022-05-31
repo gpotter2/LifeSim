@@ -12,8 +12,8 @@ type pcfval =
       env : environment;
     }
   | Tupval of pcfval list
-  | EntiteClass of { name : string; attrs : attribut list }
-  | EntiteInst of { name : string; attrs : attribut list }
+  | EntiteClass of { name : string; attrs : attributVal list }
+  | EntiteInst of { name : string; attrs : attributVal list }
   | ComportementClass of {
       entity1 : string;
       name1 : string;
@@ -23,6 +23,7 @@ type pcfval =
       instruction : expr;
     }
 
+and attributVal = string * pcfval
 and environment = (string * pcfval) list
 
 let rec printval = function
@@ -45,7 +46,16 @@ let rec printval = function
       let _ = tup_iter x in
       Printf.printf ")"
   | EntiteClass { name; _ } -> Printf.printf "<entite %s>" name
-  | EntiteInst { name; _ } -> Printf.printf "<inst entite %s>" name
+  | EntiteInst { name; attrs } ->
+      let _ = Printf.printf "<inst entite %s" name in
+      let _ =
+        List.map
+          (fun (n, v) ->
+            let _ = Printf.printf " %s=" n in
+            printval v)
+          attrs
+      in
+      Printf.printf ">"
   | ComportementClass { entity1; name1; entity2; name2; condition; _ } -> (
       match condition with
       | Bool true ->
@@ -56,7 +66,6 @@ let rec printval = function
             name1 entity2 name2)
 
 (* Environnement. *)
-let init_env = []
 let error msg = raise (Failure msg)
 let extend rho x v = (x, v) :: rho
 
@@ -64,22 +73,19 @@ let lookup var_name rho =
   try List.assoc var_name rho
   with Not_found -> error (Printf.sprintf "Undefined ident '%s'" var_name)
 
+let unpacked_attrs attrs =
+  List.map
+    (fun x ->
+      match x with
+      | Attribut (attr, v) -> (attr, v))
+    attrs
+
 let merge_attrs default_attrs attrs =
-  let unpacked_attrs =
-    List.map
-      (fun x ->
-        match x with
-        | Attribut (attr, v) -> (attr, v))
-      attrs
-  in
   let rec parc x ret =
     match x with
     | [] -> ret
-    | Attribut (attr, v) :: rem ->
-        let w =
-          Attribut
-            (attr, try List.assoc attr unpacked_attrs with Not_found -> v)
-        in
+    | (attr, v) :: rem ->
+        let w = (attr, try List.assoc attr attrs with Not_found -> v) in
         parc rem (w :: ret)
   in
   parc default_attrs []
@@ -134,14 +140,34 @@ let rec eval e rho =
       let rho1 = extend rho f fval in
       eval e2 rho1
   | Tuple x -> Tupval (List.map (fun e -> eval e rho) x)
-  | Entite (n, attrs) -> EntiteClass { name = n; attrs }
+  | Entite (n, attrs) ->
+      EntiteClass
+        {
+          name = n;
+          attrs =
+            List.map (fun (s, t) -> (s, eval t rho)) (unpacked_attrs attrs);
+        }
   | EntiteVal (n, custom_attrs) ->
       let default_attrs =
         match lookup n rho with
         | EntiteClass { attrs; _ } -> attrs
-        | _ -> raise (Failure "")
+        | _ -> raise (Failure "Type isn't an EntityClass")
       in
-      EntiteInst { name = n; attrs = merge_attrs default_attrs custom_attrs }
+      let attrs =
+        List.map (fun (s, t) -> (s, eval t rho)) (unpacked_attrs custom_attrs)
+      in
+      EntiteInst { name = n; attrs = merge_attrs default_attrs attrs }
+  | EntiteAccess (n, attr) -> (
+      let entity = lookup n rho in
+      match entity with
+      | EntiteInst { attrs; _ } -> (
+          match List.assoc_opt attr attrs with
+          | None -> raise (Failure "Unknown attribute")
+          | Some x -> x)
+      | _ ->
+          raise
+            (Failure
+               "Cannot use access operator on an object that isn't a struct "))
   | Comportement (e1, n1, e2, n2, cond, instr) ->
       ComportementClass
         {
@@ -153,4 +179,4 @@ let rec eval e rho =
           instruction = instr;
         }
 
-let eval e = eval e init_env
+let eval e rho = eval e rho

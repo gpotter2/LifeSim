@@ -91,6 +91,7 @@ rule lex = parse
   | "+"   { PLUS } | "-"   { MINUS } | "*" { MULT } | "/" { DIV }
   | ";"   { SEMI }
   | ","   { COMA }
+  | "."   { POINT }
   | "->"  { ARROW }
   | '('   { LPAR }
   | ')'   { RPAR }

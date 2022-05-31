@@ -12,7 +12,7 @@
 %token TRUE FALSE
 %token <string> STRING
 %token PLUS MINUS MULT DIV EQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
-%token LPAR RPAR LBRACK RBRACK SEMI COLON COMA
+%token LPAR RPAR LBRACK RBRACK SEMI COLON COMA POINT
 %token LET REC LETREC IN FUN ARROW
 %token IF THEN ELSE
 %token STRUCT
@@ -26,24 +26,25 @@
 
 %%
 
-main: expr { $1 };
+main: main_expr { $1 };
 
-expr:
-  LETREC IDENT IDENT seqident EQUAL expr IN expr    { Letrec($2, $3, (body $4 $6), $8) }
-| LET REC IDENT IDENT seqident EQUAL expr IN expr   { Letrec($3, $4, (body $5 $7), $9) }
-| LET IDENT seqident EQUAL expr IN expr       { Let($2, (body $3 $5) , $7) }
-| FUN IDENT ARROW expr                        { Fun($2, $4) }
-| IF expr THEN expr ELSE expr                 { If($2, $4, $6) }
+main_expr:
+  expr
+    { $1 }
 | IDENT IDENT DOUBLARRO IDENT IDENT DO LBRACK expr RBRACK
     { Comportement($1, $2, $4, $5, Bool(true), $8) }
 | IDENT IDENT DOUBLARRO IDENT IDENT IF expr DO LBRACK expr RBRACK
     { Comportement($1, $2, $4, $5, $7, $10) }
 | STRUCT IDENT LBRACK entite_expr RBRACK
     { Entite($2, $4) }
-| IDENT LBRACK RBRACK
-    { EntiteVal($1, []) }
-| IDENT LBRACK entite_expr RBRACK
-    { EntiteVal($1, $3) }
+;
+
+expr:
+  LETREC IDENT IDENT seqident EQUAL expr IN main_expr    { Letrec($2, $3, (body $4 $6), $8) }
+| LET REC IDENT IDENT seqident EQUAL expr IN main_expr   { Letrec($3, $4, (body $5 $7), $9) }
+| LET IDENT seqident EQUAL expr IN main_expr  { Let($2, (body $3 $5) , $7) }
+| FUN IDENT ARROW main_expr                   { Fun($2, $4) }
+| IF expr THEN expr ELSE expr                 { If($2, $4, $6) }
 | arith_expr                                  { $1 }
 ;
 
@@ -85,15 +86,20 @@ atom:
 | TRUE           { Bool(true) }
 | FALSE          { Bool(false) }
 | STRING         { String($1) }
+| IDENT LBRACK RBRACK
+    { EntiteVal($1, []) }
+| IDENT LBRACK entite_expr RBRACK
+    { EntiteVal($1, $3) }
+| IDENT POINT IDENT
+    { EntiteAccess($1, $3) }
 | IDENT          { Ident($1) }
 | LPAR tup_expr RPAR { Tuple($2) }
 | LPAR expr RPAR { $2 }
 ;
 
 tup_expr:
-  tup_expr COMA tup_expr    { $1 @ $3 }
-  | tup_expr COMA           { $1 }
-  | expr                    { [$1] }
+  tup_expr atom    { $1 @ [$2] }
+  | atom COMA           { [$1] }
 ;
 
 seqident:

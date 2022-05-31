@@ -19,6 +19,7 @@ type expr =
   | Comportement of string * string * string * string * expr * expr
   | Entite of (string * attribut list)
   | EntiteVal of (string * attribut list)
+  | EntiteAccess of (string * string)
 
 and attribut = Attribut of string * expr
 
@@ -52,6 +53,7 @@ let rec print oc e =
   | Monop (op, e) -> fprintf oc "%s%a" op print e
   | Entite (name, _) -> fprintf oc "(entite %s)" name
   | EntiteVal (name, _) -> fprintf oc "(entite_val %s)" name
+  | EntiteAccess (name, attr) -> fprintf oc "(%s.%s)" name attr
   | Tuple tup_expr ->
       let rec tup_iter oc x =
         match x with
