@@ -6,7 +6,7 @@ struct Oiseau {
 }
 
 let close a b = (a.x - b.x) < 10 in
-Oiseau x <=> Oiseau list L if close x do {
+Oiseau x <=> Oiseau list L if (fun y -> close x y) do {
     // Actions à effectuer, modifier le comportement.
     // L contient la liste des plus proches oiseaux
     Oiseau {
