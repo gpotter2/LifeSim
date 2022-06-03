@@ -2,6 +2,7 @@ open Ast
 
 type pcfval =
   | Intval of int
+  | Floatval of float
   | Boolval of bool
   | Stringval of string
   | Funval of { param : string; body : expr; env : environment }
@@ -11,7 +12,7 @@ type pcfval =
       body : expr;
       env : environment;
     }
-  | Tupval of pcfval list
+  | Listval of pcfval list
   | EntiteClass of { name : string; attrs : attributVal list }
   | EntiteInst of { name : string; attrs : attributVal list }
   | ComportementClass of {
@@ -21,6 +22,7 @@ type pcfval =
       name2 : string;
       condition : expr;
       instruction : expr;
+      environement: environment;
     }
 
 and attributVal = string * pcfval
@@ -28,11 +30,12 @@ and environment = (string * pcfval) list
 
 let rec printval = function
   | Intval n -> Printf.printf "%d" n
+  | Floatval f -> Printf.printf "%f" f
   | Boolval b -> Printf.printf "%s" (if b then "true" else "false")
   | Stringval s -> Printf.printf "%S" s
   | Funval _ -> Printf.printf "<fun>"
   | Funrecval _ -> Printf.printf "<fun rec>"
-  | Tupval x ->
+  | Listval x ->
       let rec tup_iter x =
         match x with
         | [] -> ()
@@ -42,9 +45,9 @@ let rec printval = function
             let _ = Printf.printf ", " in
             tup_iter req
       in
-      let _ = Printf.printf "(" in
+      let _ = Printf.printf "[" in
       let _ = tup_iter x in
-      Printf.printf ")"
+      Printf.printf "]"
   | EntiteClass { name; _ } -> Printf.printf "<entite %s>" name
   | EntiteInst { name; attrs } ->
       let _ = Printf.printf "<inst entite %s" name in
@@ -93,6 +96,7 @@ let merge_attrs default_attrs attrs =
 let rec eval e rho =
   match e with
   | Int n -> Intval n
+  | Float f -> Floatval f
   | Bool b -> Boolval b
   | String s -> Stringval s
   | Ident v -> lookup v rho
@@ -117,12 +121,21 @@ let rec eval e rho =
       | "-", Intval n1, Intval n2 -> Intval (n1 - n2)
       | "*", Intval n1, Intval n2 -> Intval (n1 * n2)
       | "/", Intval n1, Intval n2 -> Intval (n1 / n2)
+      | "+", Floatval n1, Floatval n2 -> Floatval (n1 +. n2)
+      | "-", Floatval n1, Floatval n2 -> Floatval (n1 -. n2)
+      | "*", Floatval n1, Floatval n2 -> Floatval (n1 *. n2)
+      | "/", Floatval n1, Floatval n2 -> Floatval (n1 /. n2)
       | ("+" | "-" | "*" | "/"), _, _ -> error "Arithmetic on non-integers"
       | "<", Intval n1, Intval n2 -> Boolval (n1 < n2)
       | ">", Intval n1, Intval n2 -> Boolval (n1 > n2)
       | "=", Intval n1, Intval n2 -> Boolval (n1 = n2)
       | "<=", Intval n1, Intval n2 -> Boolval (n1 <= n2)
       | ">=", Intval n1, Intval n2 -> Boolval (n1 >= n2)
+      | "<", Floatval n1, Floatval n2 -> Boolval (n1 < n2)
+      | ">", Floatval n1, Floatval n2 -> Boolval (n1 > n2)
+      | "=", Floatval n1, Floatval n2 -> Boolval (n1 = n2)
+      | "<=", Floatval n1, Floatval n2 -> Boolval (n1 <= n2)
+      | ">=", Floatval n1, Floatval n2 -> Boolval (n1 >= n2)
       | ("<" | ">" | "=" | "<=" | ">="), _, _ ->
           error "Comparison of non-integers"
       | _ -> error (Printf.sprintf "Unknown binary op: %s" op))
@@ -139,7 +152,7 @@ let rec eval e rho =
       let fval = Funrecval { fname = f; param = x; body = e1; env = rho } in
       let rho1 = extend rho f fval in
       eval e2 rho1
-  | Tuple x -> Tupval (List.map (fun e -> eval e rho) x)
+  | Liste x -> Listval (List.map (fun e -> eval e rho) x)
   | Entite (n, attrs) ->
       EntiteClass
         {
@@ -177,6 +190,7 @@ let rec eval e rho =
           name2 = n2;
           condition = cond;
           instruction = instr;
+          environement = rho;
         }
 
 let eval e rho = eval e rho

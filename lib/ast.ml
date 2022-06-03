@@ -5,13 +5,14 @@
 
 type expr =
   | Int of int
+  | Float of float
   | Bool of bool
   | String of string
   | Ident of string
   | App of expr * expr
   | Monop of string * expr
   | Binop of string * expr * expr
-  | Tuple of expr list
+  | Liste of expr list
   | If of expr * expr * expr
   | Fun of string * expr
   | Let of string * expr * expr
@@ -32,6 +33,7 @@ let rec un_body params = function
 let rec print oc e =
   match e with
   | Int n -> fprintf oc "%d" n
+  | Float f -> fprintf oc "%f" f
   | Bool b -> fprintf oc "%s" (if b then "T" else "F")
   | Ident s -> fprintf oc "%s" s
   | String s -> fprintf oc "\"%s\"" s
@@ -54,7 +56,7 @@ let rec print oc e =
   | Entite (name, _) -> fprintf oc "(entite %s)" name
   | EntiteVal (name, _) -> fprintf oc "(entite_val %s)" name
   | EntiteAccess (name, attr) -> fprintf oc "(%s.%s)" name attr
-  | Tuple tup_expr ->
+  | Liste tup_expr ->
       let rec tup_iter oc x =
         match x with
         | [] -> ()
@@ -63,7 +65,7 @@ let rec print oc e =
             let _ = fprintf oc "%a, " print y in
             tup_iter oc req
       in
-      fprintf oc "(%a)" (fun oc -> tup_iter oc) tup_expr
+      fprintf oc "[%a]" (fun oc -> tup_iter oc) tup_expr
   | Comportement (e1, n1, e2, n2, cond, _) -> (
       match cond with
       | Bool true -> fprintf oc "(comportement %s[%s] <=> %s[%s])" e1 n1 e2 n2

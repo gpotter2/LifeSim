@@ -1,12 +1,3 @@
-## Essain d'oiseaux
-
-Programmer un essain d'oiseaux
-
-- lexer
-- parseur
-- sémantique opérationelle
-
-```
 struct Oiseau {
     x: 0;
     y: 0;
@@ -25,4 +16,3 @@ Oiseau x <=> Oiseau L if oiseauPres x L do {
 init {
     Oiseau: 10;
 };
-```

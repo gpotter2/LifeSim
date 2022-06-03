@@ -8,11 +8,12 @@
 %}
 
 %token <int> INT
+%token <float> FLOAT
 %token <string> IDENT
 %token TRUE FALSE
 %token <string> STRING
-%token PLUS MINUS MULT DIV EQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
-%token LPAR RPAR LBRACK RBRACK SEMI COLON COMA POINT
+%token PLUS MINUS MULT DIV EQUAL GREATER SMALLER POWER GREATEREQUAL SMALLEREQUAL
+%token LPAR RPAR LBRACK RBRACK LBRACE RBRACE SEMI COLON COMA POINT
 %token LET REC LETREC IN FUN ARROW
 %token IF THEN ELSE
 %token STRUCT
@@ -31,11 +32,11 @@ main: main_expr { $1 };
 main_expr:
   expr
     { $1 }
-| IDENT IDENT DOUBLARRO IDENT IDENT DO LBRACK expr RBRACK
+| IDENT IDENT DOUBLARRO IDENT IDENT DO LBRACE expr RBRACE
     { Comportement($1, $2, $4, $5, Bool(true), $8) }
-| IDENT IDENT DOUBLARRO IDENT IDENT IF expr DO LBRACK expr RBRACK
+| IDENT IDENT DOUBLARRO IDENT IDENT IF expr DO LBRACE expr RBRACE
     { Comportement($1, $2, $4, $5, $7, $10) }
-| STRUCT IDENT LBRACK entite_expr RBRACK
+| STRUCT IDENT LBRACE entite_expr RBRACE
     { Entite($2, $4) }
 ;
 
@@ -65,6 +66,7 @@ arith_expr:
 | arith_expr MINUS arith_expr        { Binop("-", $1, $3) }
 | arith_expr MULT arith_expr         { Binop("*", $1, $3) }
 | arith_expr DIV arith_expr          { Binop("/", $1, $3) }
+| arith_expr POWER arith_expr        { Binop("^", $1, $3) }
 ;
 
 /* Attention : on considère ci-dessous que MINUS atom est dans la categorie
@@ -83,22 +85,23 @@ application:
 
 atom:
   INT            { Int($1) }
+| FLOAT          { Float($1) }
 | TRUE           { Bool(true) }
 | FALSE          { Bool(false) }
 | STRING         { String($1) }
-| IDENT LBRACK RBRACK
+| IDENT LBRACE RBRACE
     { EntiteVal($1, []) }
-| IDENT LBRACK entite_expr RBRACK
+| IDENT LBRACE entite_expr RBRACE
     { EntiteVal($1, $3) }
 | IDENT POINT IDENT
     { EntiteAccess($1, $3) }
 | IDENT          { Ident($1) }
-| LPAR tup_expr RPAR { Tuple($2) }
+| LBRACK lst_expr RBRACK { Liste($2) }
 | LPAR expr RPAR { $2 }
 ;
 
-tup_expr:
-  tup_expr atom    { $1 @ [$2] }
+lst_expr:
+  lst_expr atom    { $1 @ [$2] }
   | atom COMA           { [$1] }
 ;
 

@@ -56,10 +56,9 @@ let main () =
                 List.assoc_opt entity2 !global_env )
             with
             | None, None -> Printf.printf "Invalid entity names !\n"
-            | _ -> comportements := (entity1, entity2, v) :: !comportements)
-        | Sem.EntiteInst { name = "init"; attrs } -> (
+            | _ -> comportements := v :: !comportements)
+        | Sem.EntiteInst { name = "init"; attrs } ->
             Simulator.run !global_env !comportements attrs
-        )
         | _ -> Sem.printval v
       in
       Printf.printf "\n%!"

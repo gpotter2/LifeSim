@@ -69,6 +69,8 @@ rule lex = parse
       { lex lexbuf }     (* on passe les espaces *)
   | ['0'-'9']+ as lxm
       { INT(int_of_string lxm) }
+  | ['0'-'9']+ '.' ['0'-'9']* as lxm
+      { FLOAT(float_of_string lxm) }
   | [ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z' ]* as lxm
       { match lxm with
           "let" -> LET
@@ -88,15 +90,17 @@ rule lex = parse
   | "<=>" { DOUBLARRO }
   | ">"   { GREATER} | "<"  { SMALLER }
   | ">="  { GREATEREQUAL} | "<="  { SMALLEREQUAL }
-  | "+"   { PLUS } | "-"   { MINUS } | "*" { MULT } | "/" { DIV }
+  | "+"   { PLUS } | "-"   { MINUS } | "*" { MULT } | "/" { DIV } | "^" { POWER }
   | ";"   { SEMI }
   | ","   { COMA }
   | "."   { POINT }
   | "->"  { ARROW }
   | '('   { LPAR }
   | ')'   { RPAR }
-  | '{'   { LBRACK }
-  | '}'   { RBRACK }
+  | '{'   { LBRACE }
+  | '}'   { RBRACE }
+  | '['   { LBRACK }
+  | ']'   { RBRACK }
   | ':'   { COLON }
   | '"'   { reset_string_buffer();
             in_string lexbuf;
