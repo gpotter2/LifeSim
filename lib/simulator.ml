@@ -2,6 +2,18 @@ type entity = Entity of Sem.attributVal list
 
 let instants = 100
 
+let print_entities entities =
+  List.map
+    (fun (name, entities) ->
+      let _ = Printf.printf "<%s>:\n" name in
+      List.map
+        (fun (i, e) ->
+          Printf.printf "- %d " i;
+          Sem.printval e;
+          Printf.printf "\n")
+        entities)
+    entities
+
 let run env comportements init_attrs =
   let _ = Printf.printf "SIMULATOR\n\n" in
   let lookup_cls x =
@@ -30,19 +42,6 @@ let run env comportements init_attrs =
     | x :: rem -> build_entity x :: build_entity_list rem
   in
   let entities = build_entity_list init_attrs in
-  let _ =
-    let _ = Printf.printf "# Inital condition:\n" in
-    List.map
-      (fun (name, entities) ->
-        let _ = Printf.printf "%s:\n" name in
-        List.map
-          (fun (i, e) ->
-            Printf.printf "- %d " i;
-            Sem.printval e;
-            Printf.printf "\n")
-          entities)
-      entities
-  in
   let next_instant entities =
     let jouer_comportement comp entities =
       match comp with
@@ -59,18 +58,26 @@ let run env comportements init_attrs =
           let entities1 = List.assoc entity1 entities in
           let apply_comportement e others =
             let env = (name1, e) :: (name2, others) :: environement in
-            match Sem.eval condition env with
-            | Sem.Boolval true -> Sem.eval instruction env
-            | Sem.Boolval false -> e
-            | _ -> raise (Failure "Condition should return a boolean!")
+            match others with
+            | Sem.Listval [] -> e
+            | Sem.Listval _ -> Sem.eval instruction env
+            | _ -> raise (Failure "Impossible case")
           in
           let rec parc_entities ents =
             match ents with
             | [] -> []
             | (i, e) :: rem ->
+                let env = (name1, e) :: environement in
+                let filter y =
+                  match Sem.app (Sem.eval condition env) y with
+                  | Sem.Boolval true -> Some y
+                  | Sem.Boolval false -> None
+                  | _ -> raise (Failure "Condition should return a boolean !")
+                in
                 let others =
                   Sem.Listval
-                    (List.map snd
+                    (List.filter_map
+                       (fun x -> filter (snd x))
                        (if entity1 == entity2 then List.remove_assoc i entities1
                        else List.assoc entity2 entities))
                 in
@@ -86,6 +93,17 @@ let run env comportements init_attrs =
       | c :: rem -> parc_comportements rem (jouer_comportement c entities)
     in
     parc_comportements comportements entities
+  in
+  let _ = Printf.printf "# Inital condition:\n" in
+  let _ = print_entities entities in
+  let _ = Printf.printf "# Comportements:\n" in
+  let _ =
+    List.map
+      (fun x ->
+        Printf.printf "- ";
+        Sem.printval x;
+        Printf.printf "\n")
+      comportements
   in
   let _ = next_instant entities in
   ()

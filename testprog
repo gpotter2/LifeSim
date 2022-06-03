@@ -5,12 +5,13 @@ struct Oiseau {
     vy: 0;
 }
 
-let distance a b = a.x < b.x in
-let oiseauPres a b = distance a b < 10 in
-Oiseau x <=> Oiseau L if oiseauPres x L do {
+let close a b = (a.x - b.x) < 10 in
+Oiseau x <=> Oiseau list L if close x do {
     // Actions à effectuer, modifier le comportement.
     // L contient la liste des plus proches oiseaux
-    1
+    Oiseau {
+        
+    }
 }
 
 init {

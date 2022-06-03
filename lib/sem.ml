@@ -22,7 +22,7 @@ type pcfval =
       name2 : string;
       condition : expr;
       instruction : expr;
-      environement: environment;
+      environement : environment;
     }
 
 and attributVal = string * pcfval
@@ -100,16 +100,7 @@ let rec eval e rho =
   | Bool b -> Boolval b
   | String s -> Stringval s
   | Ident v -> lookup v rho
-  | App (e1, e2) -> (
-      match (eval e1 rho, eval e2 rho) with
-      | Funval { param; body; env }, v2 ->
-          let rho1 = extend env param v2 in
-          eval body rho1
-      | (Funrecval { fname; param; body; env } as fval), v2 ->
-          let rho1 = extend env fname fval in
-          let rho2 = extend rho1 param v2 in
-          eval body rho2
-      | _, _ -> error "Apply a non-function")
+  | App (e1, e2) -> app (eval e1 rho) (eval e2 rho)
   | Monop ("-", e) -> (
       match eval e rho with
       | Intval n -> Intval (-n)
@@ -193,4 +184,16 @@ let rec eval e rho =
           environement = rho;
         }
 
+and app x y =
+  match (x, y) with
+  | Funval { param; body; env }, v2 ->
+      let rho1 = extend env param v2 in
+      eval body rho1
+  | (Funrecval { fname; param; body; env } as fval), v2 ->
+      let rho1 = extend env fname fval in
+      let rho2 = extend rho1 param v2 in
+      eval body rho2
+  | _, _ -> error "Apply a non-function"
+
 let eval e rho = eval e rho
+let app x y = app x y

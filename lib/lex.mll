@@ -85,6 +85,7 @@ rule lex = parse
         | "false" -> FALSE
         | "do" -> DO
         | "struct" -> STRUCT
+        | "list" -> LIST
         | _ -> IDENT(lxm) }
   | "="   { EQUAL }
   | "<=>" { DOUBLARRO }

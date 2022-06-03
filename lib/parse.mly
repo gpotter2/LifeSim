@@ -17,7 +17,7 @@
 %token LET REC LETREC IN FUN ARROW
 %token IF THEN ELSE
 %token STRUCT
-%token DOUBLARRO DO
+%token DOUBLARRO DO LIST
 %left EQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
 %left PLUS MINUS
 %left MULT DIV
@@ -32,10 +32,10 @@ main: main_expr { $1 };
 main_expr:
   expr
     { $1 }
-| IDENT IDENT DOUBLARRO IDENT IDENT DO LBRACE expr RBRACE
-    { Comportement($1, $2, $4, $5, Bool(true), $8) }
-| IDENT IDENT DOUBLARRO IDENT IDENT IF expr DO LBRACE expr RBRACE
-    { Comportement($1, $2, $4, $5, $7, $10) }
+| IDENT IDENT DOUBLARRO IDENT LIST IDENT DO LBRACE expr RBRACE
+    { Comportement($1, $2, $4, $6, Bool(true), $9) }
+| IDENT IDENT DOUBLARRO IDENT LIST IDENT IF expr DO LBRACE expr RBRACE
+    { Comportement($1, $2, $4, $6, $8, $11) }
 | STRUCT IDENT LBRACE entite_expr RBRACE
     { Entite($2, $4) }
 ;
