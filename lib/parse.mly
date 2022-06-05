@@ -13,8 +13,8 @@
 %token TRUE FALSE
 %token <string> STRING
 %token PLUS MINUS MULT DIV EQUAL GREATER SMALLER POWER GREATEREQUAL SMALLEREQUAL
-%token LPAR RPAR LBRACK RBRACK LBRACE RBRACE SEMI COLON COMA POINT
-%token SUM
+%token LPAR RPAR LBRACK RBRACK LBRACE RBRACE SEMI COLON COMA POINT UNDERSCORE
+%token SUM OF LEN RAND
 %token LET REC LETREC IN FUN ARROW
 %token IF THEN ELSE
 %token STRUCT
@@ -22,6 +22,7 @@
 %left EQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
 %left PLUS MINUS
 %left MULT DIV
+%left POWER
 
 %start main
 %type <Ast.expr> main
@@ -34,7 +35,9 @@ main_expr:
   expr
     { $1 }
 | IDENT IDENT DOUBLARRO IDENT LIST IDENT DO LBRACE expr RBRACE
-    { Comportement($1, $2, $4, $6, Fun("x", Bool(true)), $9) }
+    { Comportement($1, $2, $4, $6, Fun("always_true", Bool(true)), $9) }
+| IDENT IDENT DOUBLARRO UNDERSCORE DO LBRACE expr RBRACE
+    { Comportement($1, $2, "none", "none", Fun("none", Bool(false)), $7) }
 | IDENT IDENT DOUBLARRO IDENT LIST IDENT IF expr DO LBRACE expr RBRACE
     { Comportement($1, $2, $4, $6, $8, $11) }
 | STRUCT IDENT LBRACE entite_expr RBRACE
@@ -47,7 +50,9 @@ expr:
 | LET IDENT seqident EQUAL expr IN main_expr  { Let($2, (body $3 $5) , $7) }
 | FUN IDENT ARROW main_expr                   { Fun($2, $4) }
 | IF expr THEN expr ELSE expr                 { If($2, $4, $6) }
-| SUM expr IN expr                            { Sum($2, $4)} 
+| SUM expr OF expr                            { Sum($2, $4)}
+| LEN expr                                    { Len($2) }
+| RAND expr                                   { Rand($2) }
 | arith_expr                                  { $1 }
 ;
 
@@ -103,8 +108,8 @@ atom:
 ;
 
 lst_expr:
-  atom COMA lst_expr    { $1 :: $3 }
-  | atom                { [$1] }
+  application COMA lst_expr    { $1 :: $3 }
+  | application                { [$1] }
 ;
 
 seqident:

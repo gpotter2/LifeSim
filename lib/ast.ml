@@ -18,6 +18,8 @@ type expr =
   | Let of string * expr * expr
   | Letrec of string * string * expr * expr
   | Sum of expr * expr
+  | Len of expr
+  | Rand of expr
   | Comportement of string * string * string * string * expr * expr
   | Entite of (string * attribut list)
   | EntiteVal of (string * attribut list)
@@ -55,6 +57,8 @@ let rec print oc e =
   | Binop (op, e1, e2) -> fprintf oc "(%a %s %a)" print e1 op print e2
   | Monop (op, e) -> fprintf oc "%s%a" op print e
   | Sum (_, _) -> fprintf oc "<sum over list>"
+  | Len _ -> fprintf oc "<len>"
+  | Rand _ -> fprintf oc "<rand>"
   | Entite (name, _) -> fprintf oc "(entite %s)" name
   | EntiteVal (name, _) -> fprintf oc "(entite_val %s)" name
   | EntiteAccess (name, attr) -> fprintf oc "(%s.%s)" name attr

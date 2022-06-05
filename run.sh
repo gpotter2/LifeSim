@@ -3,7 +3,7 @@
 mkdir -p res
 
 # On lance la simulation
-dune exec Vol testprog
+dune exec Vol testprog.txt
 RESULT=$?
 if [ $RESULT -eq 0 ]; then
     # Création de la vidéo

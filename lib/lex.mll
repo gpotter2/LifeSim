@@ -87,6 +87,9 @@ rule lex = parse
         | "struct" -> STRUCT
         | "list" -> LIST
         | "sum" -> SUM
+        | "of" -> OF
+        | "len" -> LEN
+        | "rand" -> RAND
         | _ -> IDENT(lxm) }
   | "="   { EQUAL }
   | "<=>" { DOUBLARRO }
@@ -104,6 +107,7 @@ rule lex = parse
   | '['   { LBRACK }
   | ']'   { RBRACK }
   | ':'   { COLON }
+  | '_'   { UNDERSCORE }
   | '"'   { reset_string_buffer();
             in_string lexbuf;
             STRING (get_stored_string()) }

@@ -49,14 +49,16 @@ let main () =
         match v with
         | Sem.EntiteClass { name; _ } ->
             global_env := (name, v) :: !global_env;
-            init_entities := (name, Sem.Intval 0) :: !init_entities
-        | Sem.ComportementClass { entity1; entity2; _ } -> (
-            match
-              ( List.assoc_opt entity1 !global_env,
-                List.assoc_opt entity2 !global_env )
-            with
+            init_entities := Attribut (name, Ast.Int 0) :: !init_entities;
+            Sem.printval v
+        | Sem.ComportementClass { entity1; entity2; _ } ->
+            (match
+               ( List.assoc_opt entity1 !global_env,
+                 List.assoc_opt entity2 !global_env )
+             with
             | None, None -> Printf.printf "Invalid entity names !\n"
-            | _ -> comportements := v :: !comportements)
+            | _ -> comportements := v :: !comportements);
+            Sem.printval v
         | Sem.EntiteInst { name = "init"; attrs } ->
             Simulator.run !global_env !comportements attrs
         | _ -> Sem.printval v

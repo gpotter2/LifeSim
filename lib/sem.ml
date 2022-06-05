@@ -13,7 +13,7 @@ type pcfval =
       env : environment;
     }
   | Listval of pcfval list
-  | EntiteClass of { name : string; attrs : attributVal list }
+  | EntiteClass of { name : string; attrs : attribut list }
   | EntiteInst of { name : string; attrs : attributVal list }
   | ComportementClass of {
       entity1 : string;
@@ -61,7 +61,8 @@ let rec printval = function
       Printf.printf ">"
   | ComportementClass { entity1; name1; entity2; name2; condition; _ } -> (
       match condition with
-      | Bool true ->
+      | Fun ("none", _) -> Printf.printf "<Comportement %s[%s]]>" entity1 name1
+      | Fun ("always_true", _) ->
           Printf.printf "<Comportement %s[%s] <=> %s[%s]]>" entity1 name1
             entity2 name2
       | _ ->
@@ -117,6 +118,7 @@ let rec eval e rho =
       | "-", Floatval n1, Floatval n2 -> Floatval (n1 -. n2)
       | "*", Floatval n1, Floatval n2 -> Floatval (n1 *. n2)
       | "/", Floatval n1, Floatval n2 -> Floatval (n1 /. n2)
+      | "^", Floatval n1, Floatval n2 -> Floatval (n1 ** n2)
       | ("+" | "-" | "*" | "/"), _, _ -> error "Arithmetic on non-integers"
       | "<", Intval n1, Intval n2 -> Boolval (n1 < n2)
       | ">", Intval n1, Intval n2 -> Boolval (n1 > n2)
@@ -162,17 +164,29 @@ let rec eval e rho =
           Floatval (sum (List.map i_app lst))
       | _ -> raise (Failure "Sum on an object that isn't a list"))
   | Liste x -> Listval (List.map (fun e -> eval e rho) x)
-  | Entite (n, attrs) ->
-      EntiteClass
-        {
-          name = n;
-          attrs =
-            List.map (fun (s, t) -> (s, eval t rho)) (unpacked_attrs attrs);
-        }
+  | Len liste_val -> (
+      match eval liste_val rho with
+      | Listval lst -> Floatval (Float.of_int (List.length lst))
+      | _ -> raise (Failure "Len on a non-list object !"))
+  | Rand interv -> (
+      match eval interv rho with
+      | Listval lst -> (
+          match lst with
+          | [ Intval ai; Intval bi ] ->
+              let a, b = (Float.of_int ai, Float.of_int bi) in
+              Floatval ((Random.float (b -. a)) +. a)
+          | [ Floatval a; Floatval b ] -> Floatval ((Random.float (b -. a)) +. a)
+          | _ ->
+              raise
+                (Failure "L'argument de Rand doit être une liste de 2 floats !")
+          )
+      | _ -> raise (Failure "L'argument de Rand doit être une liste!"))
+  | Entite (n, attrs) -> EntiteClass { name = n; attrs }
   | EntiteVal (n, custom_attrs) ->
       let default_attrs =
         match lookup n rho with
-        | EntiteClass { attrs; _ } -> attrs
+        | EntiteClass { attrs; _ } ->
+            List.map (fun (s, t) -> (s, eval t rho)) (unpacked_attrs attrs)
         | _ -> raise (Failure "Type isn't an EntityClass")
       in
       let attrs =

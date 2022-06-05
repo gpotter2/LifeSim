@@ -96,23 +96,23 @@ let run env comportements init_attrs =
           } ->
           let entities1 = List.assoc entity1 entities in
           let apply_comportement e others =
-            let env = (name1, e) :: (name2, others) :: environement in
-            match others with
-            | Sem.Listval [] -> e
-            | Sem.Listval _ -> (
-                let r = Sem.eval instruction env in
-                match r with
-                | Sem.EntiteInst { name; _ } ->
-                    if name <> entity1 then
-                      raise
-                        (Failure
-                           (Printf.sprintf
-                              "Comportement must return the same entity type ! \
-                               (got %s expected %s)"
-                              name entity1))
-                    else r
-                | _ -> raise (Failure "Comportement must return an entity !"))
-            | _ -> raise (Failure "Impossible case")
+            let env =
+              match name2 with
+              | "none" -> (name1, e) :: environement
+              | _ -> (name1, e) :: (name2, others) :: environement
+            in
+            let r = Sem.eval instruction env in
+            match r with
+            | Sem.EntiteInst { name; _ } ->
+                if name <> entity1 then
+                  raise
+                    (Failure
+                       (Printf.sprintf
+                          "Comportement must return the same entity type ! \
+                           (got %s expected %s)"
+                          name entity1))
+                else r
+            | _ -> raise (Failure "Comportement must return an entity !")
           in
           let rec parc_entities ents =
             match ents with
@@ -126,11 +126,15 @@ let run env comportements init_attrs =
                   | _ -> raise (Failure "Condition should return a boolean !")
                 in
                 let others =
-                  Sem.Listval
-                    (List.filter_map
-                       (fun x -> filter (snd x))
-                       (if entity1 == entity2 then List.remove_assoc i entities1
-                       else List.assoc entity2 entities))
+                  match entity2 with
+                  | "none" -> Sem.Listval []
+                  | _ ->
+                      Sem.Listval
+                        (List.filter_map
+                           (fun x -> filter (snd x))
+                           (if entity1 == entity2 then
+                            List.remove_assoc i entities1
+                           else List.assoc entity2 entities))
                 in
                 (i, apply_comportement e others) :: parc_entities rem
           in
