@@ -1,9 +1,11 @@
 open Owl_plplot
 open Owl
 
+(* Graphical config*)
 let x_size = 400.0
 let y_size = 400.0
-let instants = 1
+(* Amount of instants *)
+let instants = 100
 
 (* UTIL FUNCTIONS *)
 let print_entities entities =
@@ -18,7 +20,7 @@ let print_entities entities =
         entities)
     entities
 
-let plot_entities entities _ =
+let plot_entities entities i =
   let get_coordinates entity =
     let lookup name attrs =
       match List.assoc name attrs with
@@ -40,11 +42,9 @@ let plot_entities entities _ =
   in
   let plot_entity h entity =
     let x, y = points_by_entity entity in
-    Mat.print x;
-    Mat.print y;
     Plot.(scatter ~h ~spec:[ Marker "#[0x2295]"; MarkerSize 5. ] x y)
   in
-  let h = Plot.create "qtwidget" in
+  let h = Plot.create (Printf.sprintf "res/%03d.png" i) in
   Plot.set_background_color h 255 255 255;
   Plot.set_xrange h (x_size /. -2.0) (x_size /. 2.0);
   Plot.set_yrange h (y_size /. -2.0) (y_size /. 2.0);
@@ -162,7 +162,7 @@ let run env comportements init_attrs =
       else
         let new_ents = next_instant ents in
         let _ = plot_entities new_ents i in
-        let _ = Printf.printf (if i mod 20 == 19 then ".\n" else ". ") in
+        let _ = Printf.printf (if i mod 20 == 19 then ".\n" else ". %!") in
         run_all_rec new_ents (i + 1)
     in
     run_all_rec all_ents 0
