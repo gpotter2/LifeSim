@@ -1,7 +1,11 @@
-type entity = Entity of Sem.attributVal list
+open Owl_plplot
+open Owl
 
-let instants = 100
+let x_size = 400.0
+let y_size = 400.0
+let instants = 1
 
+(* UTIL FUNCTIONS *)
 let print_entities entities =
   List.map
     (fun (name, entities) ->
@@ -14,6 +18,40 @@ let print_entities entities =
         entities)
     entities
 
+let plot_entities entities _ =
+  let get_coordinates entity =
+    let lookup name attrs =
+      match List.assoc name attrs with
+      | Sem.Intval x -> Float.of_int x
+      | Sem.Floatval x -> x
+      | _ ->
+          raise (Failure (Printf.sprintf "Attr %s is not an int or float" name))
+    in
+    match entity with
+    | Sem.EntiteInst { attrs; _ } -> (lookup "x" attrs, lookup "y" attrs)
+    | _ -> raise (Failure "Bad entity")
+  in
+  let points_by_entity entity =
+    let selected_entities = List.map snd (List.assoc entity entities) in
+    let coordinates = List.split (List.map get_coordinates selected_entities) in
+    let x, y = (fst coordinates, snd coordinates) in
+    let l = List.length selected_entities in
+    (Mat.init 1 l (List.nth x), Mat.init 1 l (List.nth y))
+  in
+  let plot_entity h entity =
+    let x, y = points_by_entity entity in
+    Mat.print x;
+    Mat.print y;
+    Plot.(scatter ~h ~spec:[ Marker "#[0x2295]"; MarkerSize 5. ] x y)
+  in
+  let h = Plot.create "qtwidget" in
+  Plot.set_background_color h 255 255 255;
+  Plot.set_xrange h (x_size /. -2.0) (x_size /. 2.0);
+  Plot.set_yrange h (y_size /. -2.0) (y_size /. 2.0);
+  plot_entity h "Oiseau";
+  Plot.output h
+
+(* RUN SIMULATOR FUNCTION *)
 let run env comportements init_attrs =
   let _ = Printf.printf "SIMULATOR\n\n" in
   let lookup_cls x =
@@ -60,7 +98,19 @@ let run env comportements init_attrs =
             let env = (name1, e) :: (name2, others) :: environement in
             match others with
             | Sem.Listval [] -> e
-            | Sem.Listval _ -> Sem.eval instruction env
+            | Sem.Listval _ -> (
+                let r = Sem.eval instruction env in
+                match r with
+                | Sem.EntiteInst { name; _ } ->
+                    if name <> entity1 then
+                      raise
+                        (Failure
+                           (Printf.sprintf
+                              "Comportement must return the same entity type ! \
+                               (got %s expected %s)"
+                              name entity1))
+                    else r
+                | _ -> raise (Failure "Comportement must return an entity !"))
             | _ -> raise (Failure "Impossible case")
           in
           let rec parc_entities ents =
@@ -87,10 +137,10 @@ let run env comportements init_attrs =
           :: List.remove_assoc entity1 entities
       | _ -> raise (Failure "Pas un comportement !")
     in
-    let rec parc_comportements comps entities =
+    let rec parc_comportements comps ents =
       match comps with
-      | [] -> entities
-      | c :: rem -> parc_comportements rem (jouer_comportement c entities)
+      | [] -> ents
+      | c :: rem -> parc_comportements rem (jouer_comportement c ents)
     in
     parc_comportements comportements entities
   in
@@ -105,5 +155,16 @@ let run env comportements init_attrs =
         Printf.printf "\n")
       comportements
   in
-  let _ = next_instant entities in
-  ()
+  let _ = Printf.printf "# En cours:\n" in
+  let run_all all_ents =
+    let rec run_all_rec ents i =
+      if i == instants then ()
+      else
+        let new_ents = next_instant ents in
+        let _ = plot_entities new_ents i in
+        let _ = Printf.printf (if i mod 20 == 19 then ".\n" else ". ") in
+        run_all_rec new_ents (i + 1)
+    in
+    run_all_rec all_ents 0
+  in
+  run_all entities

@@ -33,7 +33,7 @@ main_expr:
   expr
     { $1 }
 | IDENT IDENT DOUBLARRO IDENT LIST IDENT DO LBRACE expr RBRACE
-    { Comportement($1, $2, $4, $6, Bool(true), $9) }
+    { Comportement($1, $2, $4, $6, Fun("x", Bool(true)), $9) }
 | IDENT IDENT DOUBLARRO IDENT LIST IDENT IF expr DO LBRACE expr RBRACE
     { Comportement($1, $2, $4, $6, $8, $11) }
 | STRUCT IDENT LBRACE entite_expr RBRACE

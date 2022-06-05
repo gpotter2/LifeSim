@@ -4,23 +4,17 @@
 
 (generate_opam_files true)
 
-(source
- (github username/reponame))
+(authors "Gabriel Potter")
 
-(authors "Author Name")
-
-(maintainers "Maintainer Name")
+(maintainers "Gabriel Potter")
 
 (license LICENSE)
 
-(documentation https://url/to/documentation)
-
 (package
  (name Vol)
- (synopsis "A short synopsis")
- (description "A longer description")
- (depends ocaml dune)
- (tags
-  (topics "to describe" your project)))
+ (synopsis "Vol")
+ (description
+  "Un langage de description et de simulation de comportements de groupes d'entitees")
+ (depends ocaml dune owl owl-plplot))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project

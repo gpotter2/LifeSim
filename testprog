@@ -1,16 +1,21 @@
 struct Oiseau {
-    x: 0;
-    y: 0;
-    vx: 0;
-    vy: 0;
+    x: 0.0;
+    y: 0.0;
+    vx: 0.0;
+    vy: 0.0;
 }
 
-let close a b = (a.x - b.x) < 10 in
-Oiseau x <=> Oiseau list L if (fun y -> close x y) do {
+let close a b = (a.x - b.x) < 10.0 in
+Oiseau x <=> Oiseau list L do {
     // Actions à effectuer, modifier le comportement.
     // L contient la liste des plus proches oiseaux
+    let vx = 0.0 in
+    let vy = 0.0 in
     Oiseau {
-        
+        x: x.x + 2.0;
+        y: x.y + 1.0;
+        vx: vx;
+        vy: vy;
     }
 }
 

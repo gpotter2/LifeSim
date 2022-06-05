@@ -104,6 +104,7 @@ let rec eval e rho =
   | Monop ("-", e) -> (
       match eval e rho with
       | Intval n -> Intval (-n)
+      | Floatval n -> Floatval (-.n)
       | _ -> error "Opposite of a non-integer")
   | Monop (op, _) -> error (Printf.sprintf "Unknown unary op: %s" op)
   | Binop (op, e1, e2) -> (

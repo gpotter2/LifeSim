@@ -3,4 +3,5 @@
 (ocamllex lex)
 
 (library
- (name Vol))
+ (name Vol)
+ (libraries owl owl-plplot))
