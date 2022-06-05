@@ -14,6 +14,7 @@
 %token <string> STRING
 %token PLUS MINUS MULT DIV EQUAL GREATER SMALLER POWER GREATEREQUAL SMALLEREQUAL
 %token LPAR RPAR LBRACK RBRACK LBRACE RBRACE SEMI COLON COMA POINT
+%token SUM
 %token LET REC LETREC IN FUN ARROW
 %token IF THEN ELSE
 %token STRUCT
@@ -46,6 +47,7 @@ expr:
 | LET IDENT seqident EQUAL expr IN main_expr  { Let($2, (body $3 $5) , $7) }
 | FUN IDENT ARROW main_expr                   { Fun($2, $4) }
 | IF expr THEN expr ELSE expr                 { If($2, $4, $6) }
+| SUM expr IN expr                            { Sum($2, $4)} 
 | arith_expr                                  { $1 }
 ;
 
@@ -101,8 +103,8 @@ atom:
 ;
 
 lst_expr:
-  lst_expr atom    { $1 @ [$2] }
-  | atom COMA           { [$1] }
+  atom COMA lst_expr    { $1 :: $3 }
+  | atom                { [$1] }
 ;
 
 seqident:

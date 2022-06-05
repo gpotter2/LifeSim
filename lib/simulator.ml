@@ -4,6 +4,7 @@ open Owl
 (* Graphical config*)
 let x_size = 400.0
 let y_size = 400.0
+
 (* Amount of instants *)
 let instants = 100
 
@@ -48,7 +49,7 @@ let plot_entities entities i =
   Plot.set_background_color h 255 255 255;
   Plot.set_xrange h (x_size /. -2.0) (x_size /. 2.0);
   Plot.set_yrange h (y_size /. -2.0) (y_size /. 2.0);
-  plot_entity h "Oiseau";
+  List.iter (plot_entity h) (List.map fst entities);
   Plot.output h
 
 (* RUN SIMULATOR FUNCTION *)

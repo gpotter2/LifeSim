@@ -144,6 +144,23 @@ let rec eval e rho =
       let fval = Funrecval { fname = f; param = x; body = e1; env = rho } in
       let rho1 = extend rho f fval in
       eval e2 rho1
+  | Sum (e, liste_val) -> (
+      let rec sum l =
+        match l with
+        | [] -> 0.
+        | h :: t -> h +. sum t
+      in
+      match eval liste_val rho with
+      | Listval lst ->
+          let func = eval e rho in
+          let i_app x =
+            match app func x with
+            | Intval x -> Float.of_int x
+            | Floatval x -> x
+            | _ -> raise (Failure "Sum function must return an int/float !")
+          in
+          Floatval (sum (List.map i_app lst))
+      | _ -> raise (Failure "Sum on an object that isn't a list"))
   | Liste x -> Listval (List.map (fun e -> eval e rho) x)
   | Entite (n, attrs) ->
       EntiteClass
