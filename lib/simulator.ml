@@ -41,15 +41,25 @@ let plot_entities entities i =
     let l = List.length selected_entities in
     (Mat.init 1 l (List.nth x), Mat.init 1 l (List.nth y))
   in
-  let plot_entity h entity =
+  let color i =
+    match i mod 5 with
+    | 0 -> (223, 22, 22)
+    | 1 -> (125, 223, 22)
+    | 2 -> (22, 113, 223)
+    | 4 -> (225, 168, 4)
+    | _ -> (0, 0, 0)
+  in
+  let plot_entity h i entity =
     let x, y = points_by_entity entity in
-    Plot.(scatter ~h ~spec:[ Marker "#[0x2295]"; MarkerSize 5. ] x y)
+    let r, g, b = color i in
+    Plot.(
+      scatter ~h ~spec:[ Marker "#[0x2295]"; MarkerSize 5.; RGB (r, g, b) ] x y)
   in
   let h = Plot.create (Printf.sprintf "res/%03d.png" i) in
   Plot.set_background_color h 255 255 255;
   Plot.set_xrange h (x_size /. -2.0) (x_size /. 2.0);
   Plot.set_yrange h (y_size /. -2.0) (y_size /. 2.0);
-  List.iter (plot_entity h) (List.map fst entities);
+  List.iteri (plot_entity h) (List.map fst entities);
   Plot.output h
 
 (* RUN SIMULATOR FUNCTION *)

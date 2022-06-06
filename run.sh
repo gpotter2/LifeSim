@@ -1,10 +1,28 @@
 #!/bin/bash
 
+# Exécution de programmes de test
+
+files=( "examples/"*.txt )
+
+PS3='Choisir le programme de test, ou 0 pour quitter: '
+select file in "${files[@]}"; do
+    if [[ $REPLY == "0" ]]; then
+        echo 'Bye!' >&2
+        exit
+    elif [[ -z $file ]]; then
+        echo 'Invalide. Réesayez' >&2
+    else
+        break
+    fi
+done
+
 rm -rf res
 mkdir -p res
+echo
+echo
 
 # On lance la simulation
-dune exec Vol testprog.txt
+dune exec Vol $files
 RESULT=$?
 if [ $RESULT -eq 0 ]; then
     # Création de la vidéo

@@ -1,0 +1,166 @@
+// Définition de l'entité
+struct Poule {
+    x: rand [-100., 100.];
+    y: rand [-100., 100.];
+}
+
+struct Renard {
+    x: rand [-100., 100.];
+    y: rand [-100., 100.];
+}
+
+struct Vipere {
+    x: rand [-100., 100.];
+    y: rand [-100., 100.];
+}
+
+
+// COMPORTEMENTS DE FUITE
+
+// Fuite des poules
+let pouleSpeed = 5. in
+let detectionPoule = 50. in
+let close a b = (a.x - b.x)^2. + (a.y - b.y)^2. < detectionPoule^2. in
+let unit a b = a / (a^2. + b^2.)^0.5 in
+Poule x <=> Renard list L if close x do {
+    let length = len L in
+    let sx = x.x - (sum (fun e -> e.x) of L) / length in
+    let sy = x.y - (sum (fun e -> e.y) of L) / length in
+    let vx = (unit sx sy) * pouleSpeed in
+    let vy = (unit sy sx) * pouleSpeed in
+    Poule {
+        x: x.x + vx;
+        y: x.y + vy;
+    }
+}
+
+// Fuite des renards
+let renardSpeed = 10. in
+let detectionRenard = 100. in
+let close a b = (a.x - b.x)^2. + (a.y - b.y)^2. < detectionRenard^2. in
+let unit a b = a / (a^2. + b^2.)^0.5 in
+Renard x <=> Vipere list L if close x do {
+    let length = len L in
+    let sx = x.x - (sum (fun e -> e.x) of L) / length in
+    let sy = x.y - (sum (fun e -> e.y) of L) / length in
+    let vx = (unit sx sy) * renardSpeed in
+    let vy = (unit sy sx) * renardSpeed in
+    Renard {
+        x: x.x + vx;
+        y: x.y + vy;
+    }
+}
+
+// Fuite des viperes
+let vipereSpeed = 20. in
+let detectionVipere = 10. in
+let close a b = (a.x - b.x)^2. + (a.y - b.y)^2. < detectionVipere^2. in
+let unit a b = a / (a^2. + b^2.)^0.5 in
+Vipere x <=> Poule list L if close x do {
+    let length = len L in
+    let sx = x.x - (sum (fun e -> e.x) of L) / length in
+    let sy = x.y - (sum (fun e -> e.y) of L) / length in
+    let vx = (unit sx sy) * vipereSpeed in
+    let vy = (unit sy sx) * vipereSpeed in
+    Vipere {
+        x: x.x + vx;
+        y: x.y + vy;
+    }
+}
+
+// COMPORTEMENTS D'ATTIRANCE
+
+let pouleSpeed = 5. in
+let detectionPoule = 50. in
+let close a b = (a.x - b.x)^2. + (a.y - b.y)^2. < detectionPoule^2. in
+let unit a b = a / (a^2. + b^2.)^0.5 in
+Poule x <=> Vipere list L if close x do {
+    let length = len L in
+    let sx = (sum (fun e -> e.x) of L) / length - x.x in
+    let sy = (sum (fun e -> e.y) of L) / length - x.y in
+    let vx = (unit sx sy) * pouleSpeed in
+    let vy = (unit sy sx) * pouleSpeed in
+    Poule {
+        x: x.x + vx;
+        y: x.y + vy;
+    }
+}
+
+let renardSpeed = 5. in
+let detectionRenard = 100. in
+let close a b = (a.x - b.x)^2. + (a.y - b.y)^2. < detectionRenard^2. in
+let unit a b = a / (a^2. + b^2.)^0.5 in
+Renard x <=> Poule list L if close x do {
+    let length = len L in
+    let sx = (sum (fun e -> e.x) of L) / length - x.x in
+    let sy = (sum (fun e -> e.y) of L) / length - x.y in
+    let vx = (unit sx sy) * renardSpeed in
+    let vy = (unit sy sx) * renardSpeed in
+    Renard {
+        x: x.x + vx;
+        y: x.y + vy;
+    }
+}
+
+let vipereSpeed = 4. in
+let detectionVipere = 100. in
+let close a b = (a.x - b.x)^2. + (a.y - b.y)^2. < detectionVipere^2. in
+let unit a b = a / (a^2. + b^2.)^0.5 in
+Vipere x <=> Renard list L if close x do {
+    let length = len L in
+    let sx = (sum (fun e -> e.x) of L) / length - x.x in
+    let sy = (sum (fun e -> e.y) of L) / length - x.y in
+    let vx = (unit sx sy) * vipereSpeed in
+    let vy = (unit sy sx) * vipereSpeed in
+    Vipere {
+        x: x.x + vx;
+        y: x.y + vy;
+    }
+}
+
+// GESTION DES BORDS
+
+let xWallLeft = -190. in
+let xWallRight = 190. in
+let yWallBot  = -190. in
+let yWallTop  = 190. in
+Vipere x <=> _ do {
+    let deltaX = if x.x > xWallRight then (xWallRight - x.x) else (if x.x < xWallLeft then (xWallLeft - x.x) else 0.) in
+    let deltaY = if x.y > yWallTop then (yWallTop - x.y) else (if x.y < yWallBot then (yWallBot - x.y) else 0.) in
+    Vipere {
+        x: x.x + deltaX;
+        y: x.y + deltaY;
+    }
+}
+
+let xWallLeft = -190. in
+let xWallRight = 190. in
+let yWallBot  = -190. in
+let yWallTop  = 190. in
+Renard x <=> _ do {
+    let deltaX = if x.x > xWallRight then (xWallRight - x.x) else (if x.x < xWallLeft then (xWallLeft - x.x) else 0.) in
+    let deltaY = if x.y > yWallTop then (yWallTop - x.y) else (if x.y < yWallBot then (yWallBot - x.y) else 0.) in
+    Renard {
+        x: x.x + deltaX;
+        y: x.y + deltaY;
+    }
+}
+
+let xWallLeft = -190. in
+let xWallRight = 190. in
+let yWallBot  = -190. in
+let yWallTop  = 190. in
+Poule x <=> _ do {
+    let deltaX = if x.x > xWallRight then (xWallRight - x.x) else (if x.x < xWallLeft then (xWallLeft - x.x) else 0.) in
+    let deltaY = if x.y > yWallTop then (yWallTop - x.y) else (if x.y < yWallBot then (yWallBot - x.y) else 0.) in
+    Poule {
+        x: x.x + deltaX;
+        y: x.y + deltaY;
+    }
+}
+
+init {
+    Poule: 20;
+    Renard: 3;
+    Vipere: 5;
+};
