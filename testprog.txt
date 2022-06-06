@@ -1,3 +1,4 @@
+// Définition de l'entité
 struct Oiseau {
     x: rand [-100., 100.];
     y: rand [-100., 100.];
@@ -76,7 +77,8 @@ Oiseau x <=> Oiseau list L if close x do {
 }
 
 // Comportement: séparation
-let close a b = ((a.x - b.x)^2. + (a.y - b.y)^2.) < 100.0 in
+let norm a b = (a^2. + b^2.)^0.5 in
+let close a b = ((a.x - b.x)^2. + (a.y - b.y)^2.) < 400.0 in
 let unit a b = a / (a^2. + b^2.)^0.5 in
 Oiseau x <=> Oiseau list L if close x do {
     let length = len L in
@@ -91,8 +93,8 @@ Oiseau x <=> Oiseau list L if close x do {
         vx: x.vx;
         vy: x.vy;
         // On met la nouvelle accélération
-        ax: x.ax + ax * 2.;
-        ay: x.ay + ay * 2.;
+        ax: x.ax + ax;
+        ay: x.ay + ay;
     }
 }
 

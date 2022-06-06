@@ -6,7 +6,7 @@ let x_size = 400.0
 let y_size = 400.0
 
 (* Amount of instants *)
-let instants = 1000
+let instants = 200
 
 (* UTIL FUNCTIONS *)
 let print_entities entities =

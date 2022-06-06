@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm -rf res
 mkdir -p res
 
 # On lance la simulation
