@@ -22,7 +22,7 @@ echo
 echo
 
 # On lance la simulation
-dune exec Vol $file
+dune exec LifeSim $file
 RESULT=$?
 if [ $RESULT -eq 0 ]; then
     # Création de la vidéo

@@ -1,4 +1,4 @@
 (executables
- (public_names Vol)
+ (public_names LifeSim)
  (names run)
- (libraries Vol))
+ (libraries LifeSim))

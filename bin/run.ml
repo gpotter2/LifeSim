@@ -1,6 +1,6 @@
 let version = "0.01"
 
-open Vol
+open LifeSim
 
 let usage () =
   let _ =

@@ -3,5 +3,5 @@
 (ocamllex lex)
 
 (library
- (name Vol)
+ (name LifeSim)
  (libraries owl owl-plplot))

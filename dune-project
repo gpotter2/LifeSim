@@ -1,6 +1,6 @@
 (lang dune 3.0)
 
-(name Vol)
+(name LifeSim)
 
 (generate_opam_files true)
 
@@ -11,8 +11,8 @@
 (license LICENSE)
 
 (package
- (name Vol)
- (synopsis "Vol")
+ (name LifeSim)
+ (synopsis "LifeSim")
  (description
   "Un langage de description et de simulation de comportements de groupes d'entitees")
  (depends ocaml dune owl owl-plplot))
