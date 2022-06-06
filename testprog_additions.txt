@@ -1,0 +1,38 @@
+// Comportement: séparation
+let close a b = ((a.x - b.x)^2. + (a.y - b.y)^2.) < 10.0 in
+let unit a b = a / (a^2. + b^2.)^0.5 in
+Oiseau x <=> Oiseau list L if close x do {
+    let length = len L in
+    let sx = x.x - (sum (fun e -> e.x) of L) / length in
+    let sy = x.y - (sum (fun e -> e.y) of L) / length in
+    let ax = unit sx sy in
+    let ay = unit sy sx in
+    Oiseau {
+        // On ne touche pas à la position et à la vitesse
+        x: x.x;
+        y: x.y;
+        vx: x.vx;
+        vy: x.vy;
+        // On met la nouvelle accélération
+        ax: x.ax + ax / 10.;
+        ay: x.ay + ay / 10.;
+    }
+}
+
+// Comportement: bords
+let xWallLeft = -190. in
+let xWallRight = 190. in
+let yWallBot  = -190. in
+let yWallTop  = 190. in
+Oiseau x <=> _ do {
+    let deltaX = if x.x > xWallRight then (xWallRight - x.x) else (if x.x < xWallLeft then (xWallLeft - x.x) else 0.) in
+    let deltaY = if x.y > yWallTop then (yWallTop - x.y) else (if x.y < yWallBot then (yWallBot - x.y) else 0.) in
+    Oiseau {
+        x: x.x;
+        y: x.y;
+        vx: x.vx;
+        vy: x.vy;
+        ax: x.ax + 20. * deltaX / (deltaX ^ 2. + 1.);
+        ay: x.ay + 20. * deltaY / (deltaY ^ 2. + 1.);
+    }
+}

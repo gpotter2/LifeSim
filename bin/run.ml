@@ -68,8 +68,12 @@ let main () =
     | Lex.Eoi ->
         Printf.printf "Bye bye.\n%!";
         exit 0
-    | Failure msg -> Printf.printf "Erreur: %s\n\n" msg
-    | Parsing.Parse_error -> Printf.printf "Erreur de syntaxe\n\n"
+    | Failure msg ->
+        Printf.printf "Erreur: %s\n\n" msg;
+        exit 1
+    | Parsing.Parse_error ->
+        Printf.printf "Erreur de syntaxe\n\n";
+        exit 1
   done
 ;;
 

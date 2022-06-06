@@ -14,7 +14,7 @@
 %token <string> STRING
 %token PLUS MINUS MULT DIV EQUAL GREATER SMALLER POWER GREATEREQUAL SMALLEREQUAL
 %token LPAR RPAR LBRACK RBRACK LBRACE RBRACE SEMI COLON COMA POINT UNDERSCORE
-%token SUM OF LEN RAND
+%token SUM OF LEN RAND DBG
 %token LET REC LETREC IN FUN ARROW
 %token IF THEN ELSE
 %token STRUCT
@@ -53,6 +53,7 @@ expr:
 | SUM expr OF expr                            { Sum($2, $4)}
 | LEN expr                                    { Len($2) }
 | RAND expr                                   { Rand($2) }
+| DBG expr                                    { Dbg($2) }
 | arith_expr                                  { $1 }
 ;
 

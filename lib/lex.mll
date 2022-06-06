@@ -90,6 +90,7 @@ rule lex = parse
         | "of" -> OF
         | "len" -> LEN
         | "rand" -> RAND
+        | "dbg" -> DBG
         | _ -> IDENT(lxm) }
   | "="   { EQUAL }
   | "<=>" { DOUBLARRO }

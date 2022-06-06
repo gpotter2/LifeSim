@@ -8,7 +8,7 @@ struct Oiseau {
 }
 
 // Comportement: inertie
-let maxSpeed = 10. in
+let maxSpeed = 5. in
 let unit a b = a / (a^2. + b^2.)^0.5 * maxSpeed in
 Oiseau x <=> _ do {
     let ivx = x.vx + x.ax in
@@ -28,8 +28,9 @@ Oiseau x <=> _ do {
 
 // Comportement: alignement
 // -> Des points proches s'alignent dans la même direction
-let close a b = (a.x - b.x) < 10.0 in
-let unit a b = a / (a^2. + b^2.)^0.5 in
+let close a b = (a.x - b.x)^2. + (a.y - b.y)^2. < 10000.0 in
+let maxSpeed = 5. in
+let unit a b = a / (a^2. + b^2.)^0.5 * maxSpeed in
 Oiseau x <=> Oiseau list L if close x do {
     let length = len L in
     let sx = (sum (fun e -> e.vx) of L) / length in
@@ -44,20 +45,24 @@ Oiseau x <=> Oiseau list L if close x do {
         vy: x.vy;
         // On met la nouvelle accélération
         ax: x.ax + ax;
-        ay: x.ay + ax;
+        ay: x.ay + ay;
     }
 }
 
 // Comportement: cohésion
 // -> Les points essaient de se diriger vers le centre du groupe de leurs voisins 
-let close a b = (a.x - b.x) < 10.0 in
-let unit a b = a / (a^2. + b^2.)^(0.5) in
+let close a b = (a.x - b.x)^2. + (a.y - b.y)^2. < 10000.0 in
+let maxSpeed = 5. in
+let maxAcc = 1. in
+let unit a b = a / (a^2. + b^2.)^0.5 in
 Oiseau x <=> Oiseau list L if close x do {
     let length = len L in
     let sx = (sum (fun e -> e.x) of L) / length in
     let sy = (sum (fun e -> e.y) of L) / length in
-    let ax = (unit sx sy) - x.x in
-    let ay = (unit sy sx) - x.y in
+    let uax = (unit sx sy) * maxSpeed - x.x in
+    let uay = (unit sy sx) * maxSpeed - x.y in
+    let ax = (unit uax uay) * maxAcc in
+    let ay = (unit uay uax) * maxAcc  in
     Oiseau {
         // On ne touche pas à la position et à la vitesse
         x: x.x;
@@ -65,26 +70,29 @@ Oiseau x <=> Oiseau list L if close x do {
         vx: x.vx;
         vy: x.vy;
         // On met la nouvelle accélération
-        ax: x.ax + ax / 50.;
-        ay: x.ay + ay / 50.;
+        ax: x.ax + ax;
+        ay: x.ay + ay;
     }
 }
 
-//Comportement: bords
-let xWallLeft = -190. in
-let xWallRight = 190. in
-let yWallBot  = -190. in
-let yWallTop  = 190. in
-Oiseau x <=> _ do {
-    let deltaX = if x.x > xWallRight then (xWallRight - x.x) else (if x.x < xWallLeft then (xWallLeft - x.x) else 0.) in
-    let deltaY = if x.y > yWallTop then (yWallTop - x.y) else (if x.y < yWallBot then (yWallBot - x.y) else 0.) in
+// Comportement: séparation
+let close a b = ((a.x - b.x)^2. + (a.y - b.y)^2.) < 100.0 in
+let unit a b = a / (a^2. + b^2.)^0.5 in
+Oiseau x <=> Oiseau list L if close x do {
+    let length = len L in
+    let sx = x.x - (sum (fun e -> e.x) of L) / length in
+    let sy = x.y - (sum (fun e -> e.y) of L) / length in
+    let ax = unit sx sy in
+    let ay = unit sy sx in
     Oiseau {
+        // On ne touche pas à la position et à la vitesse
         x: x.x;
         y: x.y;
         vx: x.vx;
         vy: x.vy;
-        ax: x.ax + 20. * deltaX / (deltaX ^ 2. + 1.);
-        ay: x.ay + 20. * deltaY / (deltaY ^ 2. + 1.);
+        // On met la nouvelle accélération
+        ax: x.ax + ax * 2.;
+        ay: x.ay + ay * 2.;
     }
 }
 

@@ -6,7 +6,7 @@ let x_size = 400.0
 let y_size = 400.0
 
 (* Amount of instants *)
-let instants = 100
+let instants = 1000
 
 (* UTIL FUNCTIONS *)
 let print_entities entities =
@@ -96,23 +96,33 @@ let run env comportements init_attrs =
           } ->
           let entities1 = List.assoc entity1 entities in
           let apply_comportement e others =
-            let env =
+            let empty =
               match name2 with
-              | "none" -> (name1, e) :: environement
-              | _ -> (name1, e) :: (name2, others) :: environement
+              | "always_true" | "none" -> true
+              | _ -> (
+                  match others with
+                  | Sem.Listval [] -> false
+                  | _ -> true)
             in
-            let r = Sem.eval instruction env in
-            match r with
-            | Sem.EntiteInst { name; _ } ->
-                if name <> entity1 then
-                  raise
-                    (Failure
-                       (Printf.sprintf
-                          "Comportement must return the same entity type ! \
-                           (got %s expected %s)"
-                          name entity1))
-                else r
-            | _ -> raise (Failure "Comportement must return an entity !")
+            if not empty then e
+            else
+              let env =
+                match name2 with
+                | "none" -> (name1, e) :: environement
+                | _ -> (name1, e) :: (name2, others) :: environement
+              in
+              let r = Sem.eval instruction env in
+              match r with
+              | Sem.EntiteInst { name; _ } ->
+                  if name <> entity1 then
+                    raise
+                      (Failure
+                         (Printf.sprintf
+                            "Comportement must return the same entity type ! \
+                             (got %s expected %s)"
+                            name entity1))
+                  else r
+              | _ -> raise (Failure "Comportement must return an entity !")
           in
           let rec parc_entities ents =
             match ents with
@@ -132,7 +142,7 @@ let run env comportements init_attrs =
                       Sem.Listval
                         (List.filter_map
                            (fun x -> filter (snd x))
-                           (if entity1 == entity2 then
+                           (if entity1 = entity2 then
                             List.remove_assoc i entities1
                            else List.assoc entity2 entities))
                 in

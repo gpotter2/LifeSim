@@ -20,6 +20,7 @@ type expr =
   | Sum of expr * expr
   | Len of expr
   | Rand of expr
+  | Dbg of expr
   | Comportement of string * string * string * string * expr * expr
   | Entite of (string * attribut list)
   | EntiteVal of (string * attribut list)
@@ -77,3 +78,4 @@ let rec print oc e =
       | Bool true -> fprintf oc "(comportement %s[%s] <=> %s[%s])" e1 n1 e2 n2
       | _ ->
           fprintf oc "(comportement conditionel %s[%s] <=> %s[%s])" e1 n1 e2 n2)
+  | Dbg _ -> fprintf oc "<Debug instruction>"

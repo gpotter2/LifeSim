@@ -174,8 +174,8 @@ let rec eval e rho =
           match lst with
           | [ Intval ai; Intval bi ] ->
               let a, b = (Float.of_int ai, Float.of_int bi) in
-              Floatval ((Random.float (b -. a)) +. a)
-          | [ Floatval a; Floatval b ] -> Floatval ((Random.float (b -. a)) +. a)
+              Floatval (Random.float (b -. a) +. a)
+          | [ Floatval a; Floatval b ] -> Floatval (Random.float (b -. a) +. a)
           | _ ->
               raise
                 (Failure "L'argument de Rand doit être une liste de 2 floats !")
@@ -215,6 +215,11 @@ let rec eval e rho =
           instruction = instr;
           environement = rho;
         }
+  | Dbg e ->
+      let r = eval e rho in
+      printval r;
+      let _ = Printf.printf "\n" in
+      r
 
 and app x y =
   match (x, y) with
