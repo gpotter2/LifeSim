@@ -18,8 +18,6 @@ done
 
 rm -rf res
 mkdir -p res
-echo
-echo
 
 # On lance la simulation
 dune exec LifeSim $file

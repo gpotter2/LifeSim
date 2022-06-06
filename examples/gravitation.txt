@@ -1,0 +1,72 @@
+// Définition de l'entité
+struct Planete {
+    masse: rand [100., 1000.];
+    x: rand [-100., 100.];
+    y: rand [-100., 100.];
+    vx: rand [-5., 5.];
+    vy: rand [-5., 5.];
+    ax: rand [-0.5, 0.5];
+    ay: rand [-0.5, 0.5];
+}
+
+// Comportement: inertie
+Planete x <=> _ do {
+    Planete {
+        x: x.x + x.vx;
+        y: x.y + x.vy;
+        vx: x.vx + x.ax;
+        vy: x.vy + x.ay;
+        ax: 0.;
+        ay: 0.;
+    }
+}
+
+// Gravitation
+let unit a b = a / (a^2. + b^2.)^0.5 in
+let force e = e.masse * e.x in 
+Planete x <=> Planete list L do {
+    // On calcule le centre de gravité
+    let masseTotale = sum (fun e -> e.masse) of L in
+    let gx = (sum (fun e -> e.masse * e.x) of L) / masseTotale in
+    let gy = (sum (fun e -> e.masse * e.y) of L) / masseTotale in
+    let dx = gx - x.x in
+    let dy = gy - x.y in
+    let ax = unit dx dy in
+    let ay = unit dy dx in
+    Planete {
+        // Ce comportement ne touches pas à la position et à la vitesse
+        x: x.x;
+        y: x.y;
+        vx: x.vx;
+        vy: x.vy;
+        ax: ax;
+        ay: ay;
+    }
+}
+
+// Rebond atténuants contre les murs
+let xWallLeft = -200. in
+let xWallRight = 200. in
+let yWallBot  = -200. in
+let yWallTop  = 200. in
+Planete x <=> _ do {
+    // Manipulation un peu complexe pour gérer les rebonds avec une simple multiplication
+    let signeVX = if x.vx > 0. then 1. else -1. in
+    let signeVY = if x.vy > 0. then 1. else -1. in
+    let signeDX = if x.x > xWallRight then -0.5 else (if x.x < xWallLeft then 0.5 else signeVX) in
+    let signeDY = if x.y > yWallTop then -0.5 else (if x.y < yWallBot then 0.5 else signeVY) in
+    let mulX = signeVX * signeDX in
+    let mulY = signeVY * signeDY in
+    Planete {
+        x: x.x;
+        y: x.y;
+        vx: x.vx * mulX;
+        vy: x.vy * mulY;
+        ax: x.ax;
+        ay: x.ay;
+    }
+}
+
+init {
+    Planete: 5;
+};

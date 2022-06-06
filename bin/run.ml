@@ -1,4 +1,4 @@
-let version = "0.01"
+let version = "1.00"
 
 open LifeSim
 
@@ -27,7 +27,19 @@ let main () =
     | _ -> usage ()
   in
   let _ =
-    Printf.printf "        Simulateur de comportements, version %s\n%!" version
+    Printf.printf
+      "\n\
+      \      _     _  __     _____ _               \n\
+      \      | |   (_)/ _|   /  ___(_)             \n\
+      \      | |    _| |_ ___\\ `--. _ _ __ ___    \n\
+      \      | |   | |  _/ _ \\`--. \\ | '_ ` _ \\ \n\
+      \      | |___| | ||  __/\\__/ / | | | | | |  \n\
+      \      \\_____/_|_| \\___\\____/|_|_| |_| \
+       |_|                                 \n\
+      \      \n\
+      \      version %s\n\n\
+       %!"
+      version
   in
   let global_env = ref [] in
   let init_entities = ref [] in

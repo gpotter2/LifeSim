@@ -1,5 +1,6 @@
 open Ast
 
+(* Types runtime *)
 type pcfval =
   | Intval of int
   | Floatval of float
@@ -28,6 +29,7 @@ type pcfval =
 and attributVal = string * pcfval
 and environment = (string * pcfval) list
 
+(* Affichage des types runtime *)
 let rec printval = function
   | Intval n -> Printf.printf "%d" n
   | Floatval f -> Printf.printf "%f" f
