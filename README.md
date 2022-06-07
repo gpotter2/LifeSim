@@ -52,9 +52,9 @@ struct Grain {
 e.g.
 ```rs
 // Comportement autonome
-Grain x <=> _ {
-    let y = x.y + x.vitesse in // + vitesse
-    let my = if y < -200. then y else y + 400. in  // modulo
+Grain x <=> _ do {
+    let y = x.y - x.vitesse in
+    let my = if y < -200. then y + 400. else y in  // modulo
     Grain {
         vitesse: x.vitesse;
         x: x.x;
@@ -68,11 +68,15 @@ Grain x <=> _ {
 e.g.
 ```rs
 init {
-    Grain: 50;
-}
+    Grain: 100;
+};
 ```
 
 En exécutant ce programme, on obtient le résultat suivant:
+
+https://user-images.githubusercontent.com/10530980/172335906-7c7afbf4-8cfd-40cb-8867-8dd3ed89aca7.mp4
+
+Ce programme est extrèmement simple car les grains n'ont pas d'interactions entre eux. Les programmes de test fournis par la suite utilisent à l'inverse extensivement les interactions inter-entités.
 
 ## Programmes de test fournis
 
