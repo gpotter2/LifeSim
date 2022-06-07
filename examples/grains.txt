@@ -1,0 +1,21 @@
+// Définition de l'entité
+struct Grain {
+    vitesse: rand [1., 5.];
+    x: rand [-200., 200.];
+    y: rand [-200., 200.];
+}
+
+// Comportement autonome
+Grain x <=> _ do {
+    let y = x.y - x.vitesse in
+    let my = if y < -200. then y + 400. else y in  // modulo
+    Grain {
+        vitesse: x.vitesse;
+        x: x.x;
+        y: my;
+    }
+}
+
+init {
+    Grain: 100;
+};
