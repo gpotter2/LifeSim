@@ -13,12 +13,61 @@ Il se base sur un langage PCF amélioré supportant:
 
 Et s'articule autour d'un moteur d'exécution, ou simulateur, permettant d'exécuter ces comportements et de générer un rendu graphique.
 
+### Installation
+
+Pour installer les dépendances (owl), utiliser la commande suivante à la racine du projet:
+```
+opam install . --deps-only
+```
+
 ## Execution
 
 Le projet fournit un script `run.sh` permettant de:
 - choisir l'un des 3 exemples de programmes fournis
 - l'exécuter avec `dune exec LifeSim <prog>`
 - convertir son résultat en une vidéo `out.mp4`, en utilisant `ffmpeg`
+
+### Description du langage
+
+Un fichier de programme doit comporter 3 éléments:
+1. une description de structures, sous la forme d'une définition de structs. Ces structures sont des "entités" qui intéragissent entre elles
+
+e.g.
+```
+// Définition de l'entité
+struct Grain {
+    vitesse: rand [1., 5.];
+    x: rand [-200., 200.];
+    y: rand [-200., 200.];
+}
+```
+
+2. une description de comportements, sous l'une de ses 3 formes (autonome, externe ou externe filtrée). Il peut y avoir de nombreux comportements entre les entités que l'on veut. Un comportement définit une fonction qui modifie une entité, en fonction des autres entités (externe) possiblement filtrées (externe filtrées)
+
+e.g.
+```
+// Comportement autonome
+Grain x <=> _ {
+    let y = x.y + x.vitesse in // + vitesse
+    let my = if y < -200. then y else y + 400. in  // modulo
+    Grain {
+        vitesse: x.vitesse;
+        x: x.x;
+        y: my;
+    }
+}
+```
+
+3. un élément `init` qui définie le nombre d'entités utilisées pour l'instanciation, point d'entrée du programme
+
+e.g.
+```
+init {
+    Grain: 50;
+}
+```
+
+En exécutant ce programme, on obtient le résultat suivant:
 
 ## Programmes de test fournis
 
