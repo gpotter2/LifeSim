@@ -29,7 +29,7 @@ sudo apt install ffmpeg
 
 Le projet fournit un script `run.sh` permettant de:
 - choisir l'un des 3 exemples de programmes fournis
-- l'exécuter avec `dune exec LifeSim <prog>`
+- l'exécuter avec `dune exec LifeSim [example/prog.txt]`. On peut aussi l'exécuter sans programme de test pour avoir la console
 - convertir son résultat en une vidéo `out.mp4`, en utilisant `ffmpeg`
 
 ### Description du langage
