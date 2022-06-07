@@ -24,6 +24,17 @@ Le projet fournit un script `run.sh` permettant de:
 
 ### Gravitation
 
-Un simple programme de test implémentant des planêtes de masse aléatoire qui rebondissent sur les bords du domaine, attirées par les forces de gravitation.
+Un simple programme de test implémentant 3 comportements, pour faire des planêtes de masse aléatoire qui rebondissent sur les bords du domaine, attirées par les forces de gravitation.
 
-![](examples/gravitation.mp4)
+https://user-images.githubusercontent.com/10530980/172315766-9bdda0de-acee-47af-bbe3-a67a0d99029e.mp4
+
+### Poule renard vipère
+
+Un programme un peu plus compliqué implémentant 9 comportements pour décrire des groupes de poules (en rouge), renards (en bleu) et vipères (en vert)
+
+https://user-images.githubusercontent.com/10530980/172316201-3ad3d3a6-1d24-4c42-8edd-e3dc43896a7f.mp4
+
+### Vol d'oiseaux
+
+https://user-images.githubusercontent.com/10530980/172316232-a8ad007f-bbf6-4767-943e-40ba46520445.mp4
+
