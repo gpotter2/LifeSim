@@ -30,7 +30,7 @@ https://user-images.githubusercontent.com/10530980/172315766-9bdda0de-acee-47af-
 
 ### Poule renard vipère
 
-Un programme un peu plus compliqué implémentant 9 comportements pour décrire des groupes de poules (en rouge), renards (en bleu) et vipères (en vert)
+Un programme un peu plus compliqué implémentant 9 comportements pour décrire des groupes de poules (en rouge), renards (en vert) et vipères (en bleu)
 
 https://user-images.githubusercontent.com/10530980/172316201-3ad3d3a6-1d24-4c42-8edd-e3dc43896a7f.mp4
 
