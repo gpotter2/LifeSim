@@ -20,6 +20,11 @@ Pour installer les dépendances (owl), utiliser la commande suivante à la racin
 opam install . --deps-only
 ```
 
+Le script `run.sh` utilise ffmpeg pour générer les vidéos, il faut donc également l'installer:
+```
+sudo apt install ffmpeg
+```
+
 ## Execution
 
 Le projet fournit un script `run.sh` permettant de:
@@ -79,11 +84,13 @@ https://user-images.githubusercontent.com/10530980/172315766-9bdda0de-acee-47af-
 
 ### Poule renard vipère
 
-Un programme un peu plus compliqué implémentant 9 comportements pour décrire des groupes de poules (en rouge), renards (en vert) et vipères (en bleu)
+Un programme un peu plus compliqué implémentant 9 comportements pour décrire des groupes de poules (en rouge), renards (en vert) et vipères (en bleu).
 
 https://user-images.githubusercontent.com/10530980/172316201-3ad3d3a6-1d24-4c42-8edd-e3dc43896a7f.mp4
 
 ### Vol d'oiseaux
+
+Ce programme implémente 4 comportements nettement plus compliqués (alignement, séparation, cohésion), afin de répliquer l'exemple des [**Boids**](https://fr.wikipedia.org/wiki/Boids)), un exemple classique de simulation du comportement d'une nuée d'oiseaux.
 
 https://user-images.githubusercontent.com/10530980/172316232-a8ad007f-bbf6-4767-943e-40ba46520445.mp4
 
