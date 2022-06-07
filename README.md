@@ -3,9 +3,9 @@
 Ce projet implémente un langage de programmation interprété permettant de simuler le comportement d'entités interagissant avec d'autres entités.
 
 Il se base sur un langage PCF amélioré supportant:
-- des structs "entités", possédant des propriétés
-- des listes, ainsi qu'un opérateur de somme
-- un opérateur `rand` pour de l'aléatoire
+- des structs "entités", possédant des propriétés, leur instanciation et accès
+- des listes, ainsi qu'un opérateur de somme `sum <...> of <list>`
+- un opérateur `rand` pour de l'aléatoire, et un de debug `dbg`
 - la description de comportements sous trois formes: autonome, externe et externe filtrée
   - `Planete x <=> _ do...` -> autonome
   - `Planete x <=> Planete list L do...` -> externe
