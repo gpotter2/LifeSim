@@ -95,7 +95,7 @@ https://user-images.githubusercontent.com/10530980/172316201-3ad3d3a6-1d24-4c42-
 
 ### Vol d'oiseaux
 
-Ce programme implémente 4 comportements nettement plus compliqués (alignement, séparation, cohésion), afin de répliquer l'exemple des [**Boids**](https://fr.wikipedia.org/wiki/Boids)), un exemple classique de simulation du comportement d'une nuée d'oiseaux.
+Ce programme implémente 4 comportements nettement plus compliqués (alignement, séparation, cohésion), afin de répliquer l'exemple des [**Boids**](https://fr.wikipedia.org/wiki/Boids), un exemple classique de simulation du comportement d'une nuée d'oiseaux. On voit un comportement émergent apparaître à partir de règles simples.
 
 https://user-images.githubusercontent.com/10530980/172316232-a8ad007f-bbf6-4767-943e-40ba46520445.mp4
 
