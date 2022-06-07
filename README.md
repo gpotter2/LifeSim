@@ -16,7 +16,7 @@ Et s'articule autour d'un moteur d'exécution, ou simulateur, permettant d'exéc
 ### Installation
 
 Pour installer les dépendances (owl), utiliser la commande suivante à la racine du projet:
-```
+```sh
 opam install . --deps-only
 ```
 
@@ -33,7 +33,7 @@ Un fichier de programme doit comporter 3 éléments:
 1. une description de structures, sous la forme d'une définition de structs. Ces structures sont des "entités" qui intéragissent entre elles
 
 e.g.
-```
+```rs
 // Définition de l'entité
 struct Grain {
     vitesse: rand [1., 5.];
@@ -45,7 +45,7 @@ struct Grain {
 2. une description de comportements, sous l'une de ses 3 formes (autonome, externe ou externe filtrée). Il peut y avoir de nombreux comportements entre les entités que l'on veut. Un comportement définit une fonction qui modifie une entité, en fonction des autres entités (externe) possiblement filtrées (externe filtrées)
 
 e.g.
-```
+```rs
 // Comportement autonome
 Grain x <=> _ {
     let y = x.y + x.vitesse in // + vitesse
@@ -61,7 +61,7 @@ Grain x <=> _ {
 3. un élément `init` qui définie le nombre d'entités utilisées pour l'instanciation, point d'entrée du programme
 
 e.g.
-```
+```rs
 init {
     Grain: 50;
 }
